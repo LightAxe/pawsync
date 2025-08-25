@@ -1,8 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+const ALLOWED_ORIGIN = Deno.env.get('ALLOWED_ORIGIN')!;
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
@@ -183,10 +184,11 @@ serve(async (req) => {
     const gpx = generateGPX(activity, streams);
 
     // Upload to pet account
+    const titlePrefix = Deno.env.get('TITLE_PREFIX') || 'Run with 🐾 ';
     const formData = new FormData();
     formData.append('file', new Blob([gpx], { type: 'application/gpx+xml' }), 'activity.gpx');
     formData.append('data_type', 'gpx');
-    formData.append('name', `Run with 🐾 ${activity.name}`);
+    formData.append('name', `${titlePrefix}${activity.name}`);
 
     const uploadResponse = await fetch('https://www.strava.com/api/v3/uploads', {
       method: 'POST',
@@ -275,7 +277,7 @@ async function refreshTokenIfNeeded(connection: any): Promise<string> {
 
   const tokenData = await response.json();
 
-  // Update connection in database
+  // Update connection in database using SERVICE_ROLE for token refresh only
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const supabase = createClient(supabaseUrl, supabaseKey);
@@ -319,14 +321,17 @@ function generateGPX(activity: StravaActivity, streams: StravaStream): string {
 `;
   }
 
+  const appName = Deno.env.get('APP_NAME') || 'Pet Activity Syncer';
+  const titlePrefix = Deno.env.get('TITLE_PREFIX') || 'Run with 🐾 ';
+
   return `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Pet Activity Syncer">
+<gpx version="1.1" creator="${appName}">
   <metadata>
-    <name>Run with 🐾 ${activity.name}</name>
+    <name>${titlePrefix}${activity.name}</name>
     <time>${startTime.toISOString()}</time>
   </metadata>
   <trk>
-    <name>Run with 🐾 ${activity.name}</name>
+    <name>${titlePrefix}${activity.name}</name>
     <trkseg>
 ${trackPoints}    </trkseg>
   </trk>
