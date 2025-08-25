@@ -14,7 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      connections: {
+        Row: {
+          access_token: string
+          athlete_avatar: string | null
+          athlete_fullname: string
+          athlete_id: number
+          athlete_username: string
+          created_at: string
+          expires_at: number
+          id: string
+          refresh_token: string
+          role: Database["public"]["Enums"]["connection_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          athlete_avatar?: string | null
+          athlete_fullname: string
+          athlete_id: number
+          athlete_username: string
+          created_at?: string
+          expires_at: number
+          id?: string
+          refresh_token: string
+          role: Database["public"]["Enums"]["connection_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          athlete_avatar?: string | null
+          athlete_fullname?: string
+          athlete_id?: number
+          athlete_username?: string
+          created_at?: string
+          expires_at?: number
+          id?: string
+          refresh_token?: string
+          role?: Database["public"]["Enums"]["connection_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mirrors: {
+        Row: {
+          created_at: string
+          dog_activity_id: number | null
+          error_message: string | null
+          id: string
+          source_activity_id: number
+          status: Database["public"]["Enums"]["mirror_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dog_activity_id?: number | null
+          error_message?: string | null
+          id?: string
+          source_activity_id: number
+          status?: Database["public"]["Enums"]["mirror_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dog_activity_id?: number | null
+          error_message?: string | null
+          id?: string
+          source_activity_id?: number
+          status?: Database["public"]["Enums"]["mirror_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +124,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      connection_role: "HUMAN" | "PET"
+      mirror_status: "PENDING" | "DONE" | "ERROR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +252,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      connection_role: ["HUMAN", "PET"],
+      mirror_status: ["PENDING", "DONE", "ERROR"],
+    },
   },
 } as const
