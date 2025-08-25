@@ -26,27 +26,27 @@ export function ConnectionWizard({ humanConnection, petConnection, onConnectionU
   const handleConnect = async (role: 'HUMAN' | 'PET') => {
     setIsConnecting(role);
     
-    // Construct the OAuth URL with proper state and PKCE
-    const state = JSON.stringify({ 
-      userId: 'current-user', // This would come from auth context
-      role 
-    });
-    
-    const scopes = role === 'HUMAN' 
-      ? 'read,activity:read,activity:read_all'
-      : 'activity:write';
+    try {
+      // Get current user - in reality this would come from auth context
+      const userId = 'current-user'; // TODO: Replace with actual user ID from auth context
       
-    // In a real implementation, this would redirect to your backend OAuth endpoint
-    const oauthUrl = `/api/oauth/authorize?role=${role}&state=${encodeURIComponent(state)}&scope=${scopes}`;
-    
-    // For now, just simulate the connection process
-    setTimeout(() => {
+      // Call our OAuth authorization endpoint
+      const response = await fetch(`${window.location.origin}/functions/v1/oauth-authorize?role=${role}&userId=${userId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to get authorization URL');
+      }
+      
+      const { authUrl } = await response.json();
+      
+      // Redirect to Strava OAuth
+      window.location.href = authUrl;
+      
+    } catch (error) {
+      console.error('OAuth error:', error);
       setIsConnecting(null);
-      // In reality, this would be called after successful OAuth callback
-      onConnectionUpdate();
-    }, 2000);
-    
-    // window.location.href = oauthUrl;
+      // TODO: Show error toast
+    }
   };
 
   const currentStep = !humanConnection ? 1 : !petConnection ? 2 : 3;
